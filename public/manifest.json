@@ -1,0 +1,48 @@
+{
+  "name": "DPCC ERP — D.P. Chaturvedi College",
+  "short_name": "DPCC ERP",
+  "description": "Campus ERP, Student SIS, Faculty & Management Portal for D.P. Chaturvedi College, Seoni (MP) JS-499",
+  "start_url": "/login",
+  "scope": "/",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#190528",
+  "theme_color": "#4a044e",
+  "categories": ["education", "productivity"],
+  "icons": [
+    {
+      "src": "/icons/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/icons/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/icons/icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "Student Portal",
+      "url": "/portal/student",
+      "description": "View timetable, attendance, and LMS assignments"
+    },
+    {
+      "name": "Faculty Portal",
+      "url": "/portal/faculty",
+      "description": "Mark attendance and view workload"
+    },
+    {
+      "name": "Chairman Governance",
+      "url": "/management/dashboard",
+      "description": "Executive solvency and CapEx approvals"
+    }
+  ]
+}

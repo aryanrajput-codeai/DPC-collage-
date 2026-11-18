@@ -2,8 +2,15 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
     <title>@yield('title', 'DPCC ERP') — D.P. Chaturvedi College, Seoni (MP)</title>
+    <link rel="manifest" href="/manifest.json">
+    <meta name="theme-color" content="#4a044e">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="DPCC ERP">
+    <link rel="apple-touch-icon" href="/icons/icon-192.png">
+    <link rel="icon" type="image/svg+xml" href="/icons/icon.svg">
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
@@ -15,9 +22,12 @@
     </style>
 </head>
 <body class="bg-slate-50 text-slate-800 antialiased">
-<div class="min-h-screen flex">
+<div class="min-h-screen flex relative">
+    <!-- Sidebar Backdrop Overlay on Mobile -->
+    <div id="sidebarOverlay" onclick="toggleSidebar()" class="fixed inset-0 bg-black/60 z-40 hidden lg:hidden backdrop-blur-xs transition-opacity"></div>
+
     <!-- Sidebar -->
-    <aside class="no-print w-64 bg-[#190528] text-slate-200 border-r border-[#3e0b57] flex-shrink-0 flex flex-col">
+    <aside id="appSidebar" class="no-print fixed inset-y-0 left-0 z-50 w-64 bg-[#190528] text-slate-200 border-r border-[#3e0b57] flex-shrink-0 flex flex-col transform -translate-x-full transition-transform duration-300 lg:translate-x-0 lg:static lg:inset-auto">
         <div class="px-5 py-4 border-b border-[#3e0b57] flex items-center justify-between">
             <div class="flex items-center gap-2.5">
                 <span class="w-8 h-8 rounded-lg bg-gradient-to-br from-[#fbbf24] via-[#f59e0b] to-[#d97706] flex items-center justify-center font-extrabold text-[#190528] text-sm shadow-md">DP</span>
@@ -26,9 +36,21 @@
                     <div class="text-[10px] text-[#fef3c7]/75">D.P. Chaturvedi College &bull; JS-499</div>
                 </div>
             </div>
+            <button type="button" onclick="toggleSidebar()" class="lg:hidden text-slate-400 hover:text-white p-1 rounded">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+            </button>
         </div>
 
-        @php($roleSlug = auth()->user()->role?->slug)
+        @php
+            $roleSlug = auth()->user()?->role?->slug;
+            $homeRoute = match($roleSlug) {
+                'management' => route('management.dashboard'),
+                'student' => route('portal.student'),
+                'faculty' => route('portal.faculty'),
+                'parent' => route('portal.parent'),
+                default => route('dashboard'),
+            };
+        @endphp
         <nav class="flex-1 overflow-y-auto px-3 py-4 space-y-5 text-sm">
             @if($roleSlug === 'management')
             <div>
@@ -142,26 +164,33 @@
     <!-- Main Content -->
     <div class="flex-1 flex flex-col min-w-0">
         <!-- Header -->
-        <header class="no-print bg-white border-b border-[#701a75]/15 px-6 py-3 flex flex-wrap items-center justify-between gap-4 shadow-2xs">
-            <div>
-                <h1 class="text-lg font-bold text-[#190528]">@yield('header', 'Dashboard')</h1>
+        <header class="no-print bg-white border-b border-[#701a75]/15 px-4 lg:px-6 py-3 flex flex-wrap items-center justify-between gap-3 shadow-2xs">
+            <div class="flex items-center gap-2.5">
+                <button type="button" onclick="toggleSidebar()" class="lg:hidden p-1.5 rounded-lg text-slate-700 hover:bg-purple-50 hover:text-[#701a75] border border-slate-200 transition-colors" aria-label="Toggle navigation">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" /></svg>
+                </button>
+                <h1 class="text-base lg:text-lg font-bold text-[#190528] truncate">@yield('header', 'Dashboard')</h1>
             </div>
-            <div class="flex items-center gap-3 text-xs">
+            <div class="flex items-center gap-2 lg:gap-3 text-xs">
+                <!-- PWA Install Button -->
+                <button id="pwaInstallBtn" onclick="installPwa()" class="hidden px-2.5 py-1 rounded-md bg-gradient-to-r from-[#fbbf24] to-[#f59e0b] text-[#190528] font-bold text-[11px] shadow-xs hover:brightness-105 transition-all items-center gap-1 cursor-pointer">
+                    <span>📱 Install App</span>
+                </button>
                 @if($roleSlug === 'super_admin')
-                <a href="{{ route('admission.public') }}" target="_blank" class="px-3 py-1.5 rounded-md bg-[#fef3c7] text-[#92400e] border border-[#d97706]/30 hover:bg-[#fde68a] font-semibold transition-all">Admission Form ↗</a>
+                <a href="{{ route('admission.public') }}" target="_blank" class="hidden sm:inline px-3 py-1.5 rounded-md bg-[#fef3c7] text-[#92400e] border border-[#d97706]/30 hover:bg-[#fde68a] font-semibold transition-all">Admission Form ↗</a>
                 @endif
                 <div class="text-right">
-                    <div class="font-bold text-slate-800">{{ auth()->user()->name }}</div>
-                    <div class="text-[11px] text-[#701a75] font-medium">{{ auth()->user()->role->name ?? 'User' }}</div>
+                    <div class="font-bold text-slate-800 text-xs truncate max-w-[120px] sm:max-w-none">{{ auth()->user()->name }}</div>
+                    <div class="text-[10px] text-[#701a75] font-medium">{{ auth()->user()->role->name ?? 'User' }}</div>
                 </div>
                 <form method="POST" action="{{ route('logout') }}">
                     @csrf
-                    <button type="submit" class="px-3.5 py-1.5 rounded-md bg-gradient-to-r from-[#4a044e] to-[#701a75] hover:brightness-110 text-white font-medium shadow-xs transition-all cursor-pointer">Logout</button>
+                    <button type="submit" class="px-3 py-1.5 rounded-md bg-gradient-to-r from-[#4a044e] to-[#701a75] hover:brightness-110 text-white font-medium shadow-xs transition-all cursor-pointer text-xs">Logout</button>
                 </form>
             </div>
         </header>
 
-        <main class="flex-1 p-6 print-full">
+        <main class="flex-1 p-4 lg:p-6 pb-24 lg:pb-6 print-full">
             @if (session('success'))
                 <div class="no-print mb-4 rounded-lg bg-emerald-50 border border-emerald-200 text-emerald-800 px-4 py-3 text-sm">
                     {{ session('success') }}
@@ -181,6 +210,96 @@
         </main>
     </div>
 </div>
+
+<!-- Mobile Bottom Navigation Bar -->
+<nav class="no-print fixed bottom-0 left-0 right-0 z-30 bg-[#190528]/95 border-t border-[#3e0b57] text-slate-300 px-2 py-1.5 flex items-center justify-around text-[10px] lg:hidden shadow-2xl backdrop-blur-md">
+    <a href="{{ $homeRoute }}" class="flex flex-col items-center py-1 px-2.5 rounded-lg {{ request()->routeIs('dashboard', 'management.dashboard', 'portal.*') ? 'text-[#fbbf24] font-bold' : 'text-slate-400 hover:text-white' }}">
+        <svg class="w-5 h-5 mb-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/></svg>
+        <span>Home</span>
+    </a>
+    @if($roleSlug === 'student')
+    <a href="{{ route('portal.student') }}" class="flex flex-col items-center py-1 px-2.5 rounded-lg text-slate-400 hover:text-white">
+        <svg class="w-5 h-5 mb-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
+        <span>Timetable</span>
+    </a>
+    @else
+    <a href="{{ route('timetable.index') }}" class="flex flex-col items-center py-1 px-2.5 rounded-lg {{ request()->routeIs('timetable.*') ? 'text-[#fbbf24] font-bold' : 'text-slate-400 hover:text-white' }}">
+        <svg class="w-5 h-5 mb-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
+        <span>Schedule</span>
+    </a>
+    @endif
+    @if(in_array($roleSlug, ['super_admin', 'faculty'], true))
+    <a href="{{ route('attendance.index') }}" class="flex flex-col items-center py-1 px-2.5 rounded-lg {{ request()->routeIs('attendance.*') ? 'text-[#fbbf24] font-bold' : 'text-slate-400 hover:text-white' }}">
+        <svg class="w-5 h-5 mb-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+        <span>Attendance</span>
+    </a>
+    @else
+    <a href="{{ route('fees.index') }}" class="flex flex-col items-center py-1 px-2.5 rounded-lg {{ request()->routeIs('fees.*') ? 'text-[#fbbf24] font-bold' : 'text-slate-400 hover:text-white' }}">
+        <svg class="w-5 h-5 mb-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+        <span>Fees</span>
+    </a>
+    @endif
+    <a href="{{ route('community.communication') }}" class="flex flex-col items-center py-1 px-2.5 rounded-lg {{ request()->routeIs('community.communication') ? 'text-[#fbbf24] font-bold' : 'text-slate-400 hover:text-white' }}">
+        <svg class="w-5 h-5 mb-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"/></svg>
+        <span>Notices</span>
+    </a>
+    <button type="button" onclick="toggleSidebar()" class="flex flex-col items-center py-1 px-2.5 rounded-lg text-slate-400 hover:text-white cursor-pointer">
+        <svg class="w-5 h-5 mb-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/></svg>
+        <span>Menu</span>
+    </button>
+</nav>
+
+<script>
+// Sidebar Toggle
+function toggleSidebar() {
+    const sidebar = document.getElementById('appSidebar');
+    const overlay = document.getElementById('sidebarOverlay');
+    if (sidebar && overlay) {
+        const isHidden = sidebar.classList.contains('-translate-x-full');
+        if (isHidden) {
+            sidebar.classList.remove('-translate-x-full');
+            overlay.classList.remove('hidden');
+        } else {
+            sidebar.classList.add('-translate-x-full');
+            overlay.classList.add('hidden');
+        }
+    }
+}
+
+// Service Worker Registration
+if ('serviceWorker' in navigator) {
+    window.addEventListener('load', () => {
+        navigator.serviceWorker.register('/sw.js').catch(err => {
+            console.log('DPCC SW registration error: ', err);
+        });
+    });
+}
+
+// PWA Install Prompt
+let deferredPrompt;
+window.addEventListener('beforeinstallprompt', (e) => {
+    e.preventDefault();
+    deferredPrompt = e;
+    const installBtn = document.getElementById('pwaInstallBtn');
+    if (installBtn) {
+        installBtn.classList.remove('hidden');
+        installBtn.classList.add('inline-flex');
+    }
+});
+
+function installPwa() {
+    if (deferredPrompt) {
+        deferredPrompt.prompt();
+        deferredPrompt.userChoice.then((choiceResult) => {
+            if (choiceResult.outcome === 'accepted') {
+                const installBtn = document.getElementById('pwaInstallBtn');
+                if (installBtn) installBtn.classList.add('hidden');
+            }
+            deferredPrompt = null;
+        });
+    }
+}
+</script>
 </body>
 </html>
 

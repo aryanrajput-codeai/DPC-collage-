@@ -22,6 +22,8 @@ use Illuminate\Support\Facades\Route;
 Route::get('/', [AuthController::class, 'showLogin'])->name('home');
 Route::get('/login', [AuthController::class, 'showLogin'])->name('login');
 Route::post('/login', [AuthController::class, 'login'])->name('login.post');
+Route::view('/offline', 'offline')->name('offline');
+Route::get('/manifest.json', fn () => response()->file(public_path('manifest.json'), ['Content-Type' => 'application/manifest+json']));
 
 // Everything below requires authentication — no one can use the system without logging in
 Route::middleware('auth')->group(function () {

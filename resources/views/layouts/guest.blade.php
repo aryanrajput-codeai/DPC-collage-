@@ -4,6 +4,13 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>@yield('title', 'DPCC ERP') — D.P. Chaturvedi College, Seoni (MP)</title>
+    <link rel="manifest" href="/manifest.json">
+    <meta name="theme-color" content="#4a044e">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="DPCC ERP">
+    <link rel="apple-touch-icon" href="/icons/icon-192.png">
+    <link rel="icon" type="image/svg+xml" href="/icons/icon.svg">
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         :root {
@@ -60,6 +67,16 @@
     <div><strong class="text-[#4a044e]">D.P. Chaturvedi College (DPCC)</strong> &bull; PWD Colony, Barapathar, Seoni (M.P.) – 480661 &bull; Helpline: <a href="tel:07692226635" class="text-[#92400e] font-semibold hover:underline">07692-226635</a></div>
     <div class="text-[11px] text-slate-400">NAAC-Accredited &bull; NCTE-Recognized &bull; Over 25 Years of Academic Legacy (Est. 2000) &bull; 320+ University Gold Medalists &bull; <a href="https://www.dpccollege.com" target="_blank" class="text-[#701a75] hover:underline">www.dpccollege.com</a></div>
 </footer>
+
+<script>
+if ('serviceWorker' in navigator) {
+    window.addEventListener('load', () => {
+        navigator.serviceWorker.register('/sw.js').catch(err => {
+            console.log('DPCC SW registration error: ', err);
+        });
+    });
+}
+</script>
 </body>
 </html>
 
