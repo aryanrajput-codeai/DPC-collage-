@@ -56,13 +56,13 @@ class FeeFinanceController extends Controller
 
         FeeStructure::create($data);
 
-        return back()->with('success', 'Fee structure created (Total: ₹' . number_format($data['total_fee'], 2) . ').');
+        return back()->with('success', 'Fee structure created (Total: ₹'.number_format($data['total_fee'], 2).').');
     }
 
     public function collectFee(Request $request, StudentFeeAccount $account): RedirectResponse
     {
         $data = $request->validate([
-            'amount' => 'required|numeric|min:1|max:' . max(1, $account->balance_amount),
+            'amount' => 'required|numeric|min:1|max:'.max(1, $account->balance_amount),
             'payment_mode' => 'required|in:UPI,Card,NetBanking,Cash,Cheque,DD',
             'transaction_ref' => 'nullable|string|max:80',
             'remarks' => 'nullable|string',
@@ -71,10 +71,10 @@ class FeeFinanceController extends Controller
         $payment = FeePayment::create([
             'student_fee_account_id' => $account->id,
             'student_id' => $account->student_id,
-            'receipt_no' => 'RCPT-' . date('Y') . '-' . rand(1000, 9999),
+            'receipt_no' => 'RCPT-'.date('Y').'-'.rand(1000, 9999),
             'amount' => $data['amount'],
             'payment_mode' => $data['payment_mode'],
-            'transaction_ref' => $data['transaction_ref'] ?? ('TXN' . rand(100000, 999999)),
+            'transaction_ref' => $data['transaction_ref'] ?? ('TXN'.rand(100000, 999999)),
             'payment_date' => now()->toDateString(),
             'status' => 'Completed',
             'remarks' => $data['remarks'] ?? null,
@@ -128,7 +128,7 @@ class FeeFinanceController extends Controller
             'department_id' => 'nullable|exists:departments,id',
             'narration' => 'required|string',
         ]);
-        $data['voucher_no'] = 'VCH-' . date('Y') . '-' . rand(100, 999);
+        $data['voucher_no'] = 'VCH-'.date('Y').'-'.rand(100, 999);
         $data['gst_amount'] = $data['gst_amount'] ?? 0;
         $data['tds_amount'] = $data['tds_amount'] ?? 0;
         $data['created_by'] = Auth::id();
@@ -161,7 +161,7 @@ class FeeFinanceController extends Controller
             'quantity' => 'required|integer|min:1',
             'estimated_cost' => 'required|numeric|min:1',
         ]);
-        $data['req_no'] = 'PR-' . date('Y') . '-' . rand(100, 999);
+        $data['req_no'] = 'PR-'.date('Y').'-'.rand(100, 999);
         $data['requested_by'] = Auth::id();
         PurchaseRequisition::create($data);
 
@@ -176,7 +176,7 @@ class FeeFinanceController extends Controller
             'order_date' => 'required|date',
             'total_amount' => 'required|numeric|min:1',
         ]);
-        $data['po_no'] = 'PO-' . date('Y') . '-' . rand(100, 999);
+        $data['po_no'] = 'PO-'.date('Y').'-'.rand(100, 999);
         PurchaseOrder::create($data);
 
         if (! empty($data['purchase_requisition_id'])) {
@@ -186,4 +186,3 @@ class FeeFinanceController extends Controller
         return back()->with('success', "Purchase Order {$data['po_no']} issued.");
     }
 }
-

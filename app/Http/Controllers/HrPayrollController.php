@@ -60,7 +60,7 @@ class HrPayrollController extends Controller
         );
 
         $prefix = $data['employee_type'] === 'Faculty' ? 'FAC' : 'STF';
-        $data['staff_id'] = $prefix . '-' . rand(300, 999);
+        $data['staff_id'] = $prefix.'-'.rand(300, 999);
         $data['user_id'] = $user->id;
 
         $emp = Employee::create($data);
@@ -128,7 +128,7 @@ class HrPayrollController extends Controller
                     'net_salary' => $net,
                     'status' => 'Paid',
                     'paid_at' => now()->toDateString(),
-                    'bank_ref' => 'NEFT-' . $year . $month . '-' . $emp->id,
+                    'bank_ref' => 'NEFT-'.$year.$month.'-'.$emp->id,
                 ]
             );
         }
@@ -143,4 +143,3 @@ class HrPayrollController extends Controller
         return view('hr.payslip', compact('payroll'));
     }
 }
-

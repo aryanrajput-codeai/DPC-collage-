@@ -163,4 +163,3 @@ class FacilityLmsController extends Controller
         return back()->with('success', 'Assignment submission graded.');
     }
 }
-

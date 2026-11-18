@@ -82,7 +82,7 @@ class AttendanceController extends Controller
             );
         }
 
-        return back()->with('success', 'Student attendance recorded via ' . $request->method . '.');
+        return back()->with('success', 'Student attendance recorded via '.$request->method.'.');
     }
 
     public function markEmployeeAttendance(Request $request): RedirectResponse
@@ -140,4 +140,3 @@ class AttendanceController extends Controller
         return back()->with('success', "Correction request {$status}.");
     }
 }
-

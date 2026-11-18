@@ -57,7 +57,7 @@ class AdmissionController extends Controller
             'signature' => 'nullable|file|max:2048',
         ]);
 
-        $appNo = 'APP-' . date('Y') . '-' . rand(1000, 9999);
+        $appNo = 'APP-'.date('Y').'-'.rand(1000, 9999);
         $meritScore = round((($data['class_12_percentage'] ?? 60) * 0.5) + (($data['entrance_score'] ?? ($data['class_12_percentage'] ?? 60)) * 0.5), 2);
 
         $photoPath = $request->hasFile('photo') ? $request->file('photo')->store('admissions/photos', 'public') : null;
@@ -89,7 +89,7 @@ class AdmissionController extends Controller
             'photo_path' => $photoPath,
             'signature_path' => $sigPath,
             'application_fee_status' => 'Paid',
-            'payment_txn_id' => 'UPI-' . strtoupper(substr(md5($appNo), 0, 10)),
+            'payment_txn_id' => 'UPI-'.strtoupper(substr(md5($appNo), 0, 10)),
             'status' => 'Submitted',
         ]);
 
@@ -97,7 +97,7 @@ class AdmissionController extends Controller
             'recipient_name' => $app->full_name,
             'recipient_contact' => $app->phone,
             'channel' => 'WhatsApp',
-            'subject' => 'Application Received: ' . $app->application_no,
+            'subject' => 'Application Received: '.$app->application_no,
             'message' => "Dear {$app->full_name}, your application {$app->application_no} is submitted successfully.",
             'status' => 'Sent',
             'sent_at' => now(),
@@ -162,7 +162,7 @@ class AdmissionController extends Controller
         $regNo = $application->registration_number;
 
         if ($status === 'Confirmed' && ! $regNo) {
-            $regNo = 'REG-' . date('Y') . '-' . str_pad((string) $application->id, 4, '0', STR_PAD_LEFT);
+            $regNo = 'REG-'.date('Y').'-'.str_pad((string) $application->id, 4, '0', STR_PAD_LEFT);
             $course = $application->course;
             $studentRole = Role::where('slug', 'student')->first();
 
@@ -185,8 +185,8 @@ class AdmissionController extends Controller
                     'department_id' => $course->department_id,
                     'course_id' => $course->id,
                     'current_semester' => 1,
-                    'unique_student_id' => 'VV' . date('y') . strtoupper(substr($course->code, 0, 2)) . str_pad((string) $application->id, 3, '0', STR_PAD_LEFT),
-                    'admission_number' => 'ADM-' . date('Y') . '-' . str_pad((string) $application->id, 4, '0', STR_PAD_LEFT),
+                    'unique_student_id' => 'VV'.date('y').strtoupper(substr($course->code, 0, 2)).str_pad((string) $application->id, 3, '0', STR_PAD_LEFT),
+                    'admission_number' => 'ADM-'.date('Y').'-'.str_pad((string) $application->id, 4, '0', STR_PAD_LEFT),
                     'registration_number' => $regNo,
                     'full_name' => $application->full_name,
                     'phone' => $application->phone,
@@ -267,7 +267,7 @@ class AdmissionController extends Controller
             'notes' => 'nullable|string',
         ]);
 
-        $data['enquiry_no'] = 'ENQ-' . date('Y') . '-' . rand(100, 999);
+        $data['enquiry_no'] = 'ENQ-'.date('Y').'-'.rand(100, 999);
         $data['status'] = 'New';
         AdmissionEnquiry::create($data);
 
@@ -320,4 +320,3 @@ class AdmissionController extends Controller
         return back()->with('success', "Bulk {$request->channel} sent to {$enquiries->count()} active enquiries.");
     }
 }
-

@@ -12,6 +12,7 @@ use App\Models\LmsMaterial;
 use App\Models\LmsSubmission;
 use App\Models\Student;
 use App\Models\TimetableSlot;
+use Carbon\Carbon;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -107,7 +108,7 @@ class PortalController extends Controller
             'to_date' => 'required|date|after_or_equal:from_date',
             'reason' => 'required|string',
         ]);
-        $days = \Carbon\Carbon::parse($data['from_date'])->diffInDays(\Carbon\Carbon::parse($data['to_date'])) + 1;
+        $days = Carbon::parse($data['from_date'])->diffInDays(Carbon::parse($data['to_date'])) + 1;
         $data['days'] = $days;
         EmployeeLeave::create($data);
 
@@ -142,4 +143,3 @@ class PortalController extends Controller
         return view('portals.parent', compact('children', 'selectedChild', 'attendancePct', 'announcements'));
     }
 }
-

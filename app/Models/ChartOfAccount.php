@@ -2,6 +2,4 @@
 
 namespace App\Models;
 
-class ChartOfAccount extends BaseModel
-{
-}
+class ChartOfAccount extends BaseModel {}

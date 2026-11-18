@@ -24,6 +24,16 @@
         </div>
         <p class="text-[11px] text-slate-600 mb-2.5">Click any role to auto-fill credentials:</p>
         <div class="grid grid-cols-2 gap-2">
+            <button type="button" onclick="fillLogin('chairman@dpccollege.com', 'password')" class="col-span-2 text-left px-3 py-2 bg-gradient-to-r from-amber-50 to-orange-50 rounded-lg border border-amber-300 hover:border-[#d97706] hover:bg-amber-100 transition-all cursor-pointer group shadow-2xs">
+                <div class="flex items-center justify-between">
+                    <div class="flex items-center gap-1.5">
+                        <span class="w-2 h-2 rounded-full bg-[#d97706]"></span>
+                        <span class="text-xs font-bold text-amber-950 group-hover:text-[#d97706]">Chairman & Management</span>
+                    </div>
+                    <span class="text-[9px] font-bold uppercase tracking-wider bg-amber-200 text-amber-900 px-1.5 py-0.5 rounded">Executive</span>
+                </div>
+                <div class="text-[10px] text-amber-800/80 truncate mt-0.5">chairman@dpccollege.com (Dr. K.K. Chaturvedi)</div>
+            </button>
             <button type="button" onclick="fillLogin('admin@dpccollege.com', 'password')" class="text-left px-3 py-2 bg-white rounded-lg border border-purple-100 hover:border-[#701a75] hover:bg-[#fdf4ff] transition-all cursor-pointer group shadow-2xs">
                 <div class="flex items-center gap-1.5">
                     <span class="w-2 h-2 rounded-full bg-[#701a75]"></span>

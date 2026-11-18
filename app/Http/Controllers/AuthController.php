@@ -38,7 +38,7 @@ class AuthController extends Controller
                 'user_id' => Auth::id(),
                 'action' => 'LOGIN',
                 'module' => 'Auth',
-                'description' => 'User signed in: ' . Auth::user()->email,
+                'description' => 'User signed in: '.Auth::user()->email,
                 'ip_address' => $request->ip(),
             ]);
 
@@ -57,7 +57,7 @@ class AuthController extends Controller
                 'user_id' => Auth::id(),
                 'action' => 'LOGOUT',
                 'module' => 'Auth',
-                'description' => 'User signed out: ' . Auth::user()->email,
+                'description' => 'User signed out: '.Auth::user()->email,
                 'ip_address' => $request->ip(),
             ]);
         }
@@ -72,6 +72,7 @@ class AuthController extends Controller
     protected function homeRouteForRole(User $user): string
     {
         return match ($user->role?->slug) {
+            'management' => route('management.dashboard'),
             'student' => route('portal.student'),
             'faculty' => route('portal.faculty'),
             'parent' => route('portal.parent'),

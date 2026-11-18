@@ -149,6 +149,7 @@ class CollegeErpSeeder extends Seeder
         $roles = [];
         foreach ([
             ['super_admin', 'Super Administrator', 'Full ERP access across all campuses and modules'],
+            ['management', 'Chairman & Governing Body', 'Executive strategic governance, financial solvency, CapEx approvals, and regulatory oversight'],
             ['faculty', 'Faculty / Professor', 'Teaching, attendance, marks entry, LMS and leave'],
             ['student', 'Student', 'Student portal, attendance, results, fees and LMS'],
             ['parent', 'Parent / Guardian', 'Parent portal for linked children tracking'],
@@ -158,12 +159,23 @@ class CollegeErpSeeder extends Seeder
             $roles[$slug] = Role::create(['slug' => $slug, 'name' => $name, 'description' => $desc]);
         }
 
-        foreach (['admissions', 'students', 'academics', 'attendance', 'exams', 'library', 'fees', 'finance', 'hr', 'payroll', 'hostel', 'transport', 'lms', 'placement', 'compliance', 'settings'] as $mod) {
-            $perm = Permission::create(['slug' => "manage.{$mod}", 'name' => 'Manage ' . ucfirst($mod), 'module' => ucfirst($mod)]);
+        foreach (['admissions', 'students', 'academics', 'attendance', 'exams', 'library', 'fees', 'finance', 'hr', 'payroll', 'hostel', 'transport', 'lms', 'placement', 'compliance', 'settings', 'governance'] as $mod) {
+            $perm = Permission::create(['slug' => "manage.{$mod}", 'name' => 'Manage '.ucfirst($mod), 'module' => ucfirst($mod)]);
             $roles['super_admin']->permissions()->attach($perm->id);
+            $roles['management']->permissions()->attach($perm->id);
         }
 
         // 4. Demo Users
+        $managementUser = User::create([
+            'name' => 'Dr. K.K. Chaturvedi (Founder & Chairman)',
+            'email' => 'chairman@dpccollege.com',
+            'password' => $password,
+            'role_id' => $roles['management']->id,
+            'campus_id' => $mainCampus->id,
+            'college_id' => $collegeTech->id,
+            'phone' => '07692-226635',
+        ]);
+
         $adminUser = User::create([
             'name' => 'Dr. Amita Chaturvedi (Principal)',
             'email' => 'admin@dpccollege.com',
@@ -399,7 +411,7 @@ class CollegeErpSeeder extends Seeder
                 'net_salary' => $gross - $pf - $pt - $tds,
                 'status' => 'Paid',
                 'paid_at' => '2026-10-31',
-                'bank_ref' => 'NEFT-OCT26-' . $emp->id . '99',
+                'bank_ref' => 'NEFT-OCT26-'.$emp->id.'99',
             ]);
 
             EmployeeAttendance::create([
@@ -457,18 +469,18 @@ class CollegeErpSeeder extends Seeder
                 'unique_student_id' => $sd[5],
                 'admission_number' => $sd[6],
                 'registration_number' => $sd[7],
-                'roll_number' => 'CS-0' . ($idx + 1),
+                'roll_number' => 'CS-0'.($idx + 1),
                 'full_name' => $sd[0],
                 'email' => $sd[1],
                 'phone' => $sd[2],
-                'dob' => '2006-05-1' . ($idx + 1),
+                'dob' => '2006-05-1'.($idx + 1),
                 'gender' => $sd[3],
                 'blood_group' => 'O+',
                 'category' => $sd[4],
-                'aadhaar_last4' => '432' . $idx,
+                'aadhaar_last4' => '432'.$idx,
                 'permanent_address' => 'Bengaluru, Karnataka',
-                'emergency_contact_name' => 'Suresh ' . explode(' ', $sd[0])[1] ?? 'Parent',
-                'emergency_contact_phone' => '984509988' . $idx,
+                'emergency_contact_name' => 'Suresh '.explode(' ', $sd[0])[1] ?? 'Parent',
+                'emergency_contact_phone' => '984509988'.$idx,
                 'admission_date' => '2025-08-01',
                 'status' => 'Active',
             ]);
@@ -478,8 +490,8 @@ class CollegeErpSeeder extends Seeder
                 'student_id' => $stu->id,
                 'parent_user_id' => $idx === 0 ? $parentUser->id : null,
                 'relation' => 'Father',
-                'name' => $idx === 0 ? 'Suresh Kulkarni' : 'Mr. ' . $sd[0] . ' Sr.',
-                'phone' => '984509988' . $idx,
+                'name' => $idx === 0 ? 'Suresh Kulkarni' : 'Mr. '.$sd[0].' Sr.',
+                'phone' => '984509988'.$idx,
                 'email' => $idx === 0 ? 'parent@webotapp.edu.in' : null,
                 'occupation' => 'Engineer',
                 'annual_income' => 850000,
@@ -595,8 +607,8 @@ class CollegeErpSeeder extends Seeder
             ExamRegistration::create([
                 'exam_id' => $exam->id,
                 'student_id' => $stu->id,
-                'seat_no' => 'SEAT-30' . ($idx + 1),
-                'admit_card_number' => 'ADM-NOV26-00' . ($idx + 1),
+                'seat_no' => 'SEAT-30'.($idx + 1),
+                'admit_card_number' => 'ADM-NOV26-00'.($idx + 1),
                 'is_eligible' => $idx !== 2,
             ]);
 
@@ -668,10 +680,10 @@ class CollegeErpSeeder extends Seeder
             FeePayment::create([
                 'student_fee_account_id' => $acc->id,
                 'student_id' => $stu->id,
-                'receipt_no' => 'RCPT-2026-00' . ($idx + 1),
+                'receipt_no' => 'RCPT-2026-00'.($idx + 1),
                 'amount' => $paid,
                 'payment_mode' => $idx % 2 === 0 ? 'UPI' : 'NetBanking',
-                'transaction_ref' => 'UPI' . rand(10000000, 99999999),
+                'transaction_ref' => 'UPI'.rand(10000000, 99999999),
                 'payment_date' => now()->subDays(15 - $idx)->toDateString(),
                 'status' => 'Completed',
             ]);
@@ -716,6 +728,8 @@ class CollegeErpSeeder extends Seeder
 
         $vendor = Vendor::create(['name' => 'TechBridge India Pvt Ltd', 'gstin' => '29AABCT1234F1Z5', 'pan' => 'AABCT1234F', 'contact_person' => 'Arun Kumar', 'phone' => '9880011223', 'email' => 'sales@techbridge.in', 'category' => 'IT & Lab Equipment']);
         $req = PurchaseRequisition::create(['req_no' => 'PR-2026-001', 'department_id' => $deptCse->id, 'requested_by' => $facultyUser->id, 'item_description' => '30x Dell OptiPlex Workstations for AI Lab', 'quantity' => 30, 'estimated_cost' => 1650000, 'status' => 'PO Created']);
+        PurchaseRequisition::create(['req_no' => 'PR-2026-002', 'department_id' => $deptCse->id, 'requested_by' => $facultyUser->id, 'item_description' => 'Advanced Digital Spectrophotometer & Optics Bench for M.Sc. Physics Lab', 'quantity' => 2, 'estimated_cost' => 85000, 'status' => 'Pending']);
+        PurchaseRequisition::create(['req_no' => 'PR-2026-003', 'department_id' => $deptCse->id, 'requested_by' => $adminUser->id, 'item_description' => '15 kW Rooftop Solar Inverter System for Green Eco-Campus', 'quantity' => 1, 'estimated_cost' => 240000, 'status' => 'Pending']);
         PurchaseOrder::create(['po_no' => 'PO-2026-001', 'vendor_id' => $vendor->id, 'purchase_requisition_id' => $req->id, 'order_date' => now()->subDays(7)->toDateString(), 'total_amount' => 1620000, 'status' => 'Ordered']);
         InventoryItem::create(['item_code' => 'INV-LAB-01', 'name' => 'Digital Oscilloscope 100MHz', 'category' => 'Lab Equipment', 'department_id' => $deptEce->id, 'quantity' => 18, 'unit' => 'Units', 'reorder_level' => 5]);
 

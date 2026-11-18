@@ -2,6 +2,4 @@
 
 namespace App\Models;
 
-class FinancialYear extends BaseModel
-{
-}
+class FinancialYear extends BaseModel {}

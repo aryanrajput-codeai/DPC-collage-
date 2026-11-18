@@ -4,10 +4,14 @@ namespace Tests\Feature;
 
 use App\Models\AdmissionApplication;
 use App\Models\Certificate;
+use App\Models\Course;
 use App\Models\Exam;
 use App\Models\FeePayment;
 use App\Models\Payroll;
+use App\Models\PurchaseRequisition;
 use App\Models\Student;
+use App\Models\StudentFeeAccount;
+use App\Models\TimetableSlot;
 use App\Models\User;
 use Database\Seeders\CollegeErpSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -58,16 +62,16 @@ class CollegeErpModulesTest extends TestCase
     {
         // Wrong password rejected
         $this->post('/login', [
-            'email' => 'admin@webotapp.edu.in',
+            'email' => 'admin@dpccollege.com',
             'password' => 'wrong-password',
         ])->assertSessionHasErrors('email');
         $this->assertGuest();
 
         // Inactive user rejected
-        $studentUser = User::where('email', 'student@webotapp.edu.in')->firstOrFail();
+        $studentUser = User::where('email', 'student@dpccollege.com')->firstOrFail();
         $studentUser->update(['status' => 'Inactive']);
         $this->post('/login', [
-            'email' => 'student@webotapp.edu.in',
+            'email' => 'student@dpccollege.com',
             'password' => 'password',
         ])->assertSessionHasErrors('email');
         $this->assertGuest();
@@ -75,13 +79,14 @@ class CollegeErpModulesTest extends TestCase
         // Restore active student & test proper login + RBAC
         $studentUser->update(['status' => 'Active']);
         $this->post('/login', [
-            'email' => 'student@webotapp.edu.in',
+            'email' => 'student@dpccollege.com',
             'password' => 'password',
         ])->assertRedirect('/portal/student');
         $this->assertAuthenticatedAs($studentUser);
 
         $this->get('/portal/student')->assertStatus(200);
         $this->get('/dashboard')->assertStatus(403);
+        $this->get('/management/dashboard')->assertStatus(403);
         $this->get('/settings')->assertStatus(403);
         $this->get('/finance')->assertStatus(403);
 
@@ -89,33 +94,50 @@ class CollegeErpModulesTest extends TestCase
         $this->post('/logout')->assertRedirect('/login');
         $this->assertGuest();
 
+        // Management / Chairman login + RBAC
+        $this->post('/login', [
+            'email' => 'chairman@dpccollege.com',
+            'password' => 'password',
+        ])->assertRedirect('/management/dashboard');
+        $this->get('/management/dashboard')->assertStatus(200);
+        $this->get('/fees')->assertStatus(200);
+        $this->get('/finance')->assertStatus(200);
+        $this->get('/procurement')->assertStatus(200);
+        $this->get('/payroll')->assertStatus(200);
+
+        $this->post('/logout');
+        $this->assertGuest();
+
         // Faculty login + RBAC
         $this->post('/login', [
-            'email' => 'faculty@webotapp.edu.in',
+            'email' => 'faculty@dpccollege.com',
             'password' => 'password',
         ])->assertRedirect('/portal/faculty');
         $this->get('/portal/faculty')->assertStatus(200);
         $this->get('/attendance')->assertStatus(200);
+        $this->get('/management/dashboard')->assertStatus(403);
         $this->get('/settings')->assertStatus(403);
 
         $this->post('/logout');
 
         // Parent login + RBAC
         $this->post('/login', [
-            'email' => 'parent@webotapp.edu.in',
+            'email' => 'parent@dpccollege.com',
             'password' => 'password',
         ])->assertRedirect('/portal/parent');
         $this->get('/portal/parent')->assertStatus(200);
         $this->get('/dashboard')->assertStatus(403);
+        $this->get('/management/dashboard')->assertStatus(403);
     }
 
     public function test_all_admin_erp_module_pages_render_without_error(): void
     {
-        $admin = User::where('email', 'admin@webotapp.edu.in')->firstOrFail();
+        $admin = User::where('email', 'admin@dpccollege.com')->firstOrFail();
         $this->actingAs($admin);
 
         $routes = [
             '/dashboard',
+            '/management/dashboard',
             '/apply',
             '/track-application?application_no=APP-2026-1001',
             '/admissions',
@@ -152,7 +174,7 @@ class CollegeErpModulesTest extends TestCase
 
     public function test_printable_documents_and_portals_render_without_error(): void
     {
-        $admin = User::where('email', 'admin@webotapp.edu.in')->firstOrFail();
+        $admin = User::where('email', 'admin@dpccollege.com')->firstOrFail();
         $this->actingAs($admin);
 
         $student = Student::firstOrFail();
@@ -179,10 +201,10 @@ class CollegeErpModulesTest extends TestCase
 
     public function test_core_workflows_work_end_to_end(): void
     {
-        $admin = User::where('email', 'admin@webotapp.edu.in')->firstOrFail();
+        $admin = User::where('email', 'admin@dpccollege.com')->firstOrFail();
         $this->actingAs($admin);
 
-        $course = \App\Models\Course::firstOrFail();
+        $course = Course::firstOrFail();
 
         $resp = $this->post('/apply', [
             'course_id' => $course->id,
@@ -199,7 +221,7 @@ class CollegeErpModulesTest extends TestCase
 
         $this->post('/admissions/merit-list')->assertRedirect();
 
-        $slot = \App\Models\TimetableSlot::firstOrFail();
+        $slot = TimetableSlot::firstOrFail();
         $conflictResp = $this->post('/timetable/slots', [
             'class_section_id' => $slot->class_section_id,
             'subject_id' => $slot->subject_id,
@@ -212,11 +234,21 @@ class CollegeErpModulesTest extends TestCase
         ]);
         $conflictResp->assertSessionHasErrors('conflict');
 
-        $feeAcc = \App\Models\StudentFeeAccount::where('balance_amount', '>', 0)->firstOrFail();
+        $feeAcc = StudentFeeAccount::where('balance_amount', '>', 0)->firstOrFail();
         $this->post("/fees/accounts/{$feeAcc->id}/collect", [
             'amount' => 5000,
             'payment_mode' => 'UPI',
         ])->assertRedirect();
         $this->assertDatabaseHas('fee_payments', ['student_fee_account_id' => $feeAcc->id, 'amount' => 5000]);
+
+        // Chairman CapEx approval workflow
+        $chairman = User::where('email', 'chairman@dpccollege.com')->firstOrFail();
+        $this->actingAs($chairman);
+
+        $pendingReq = PurchaseRequisition::where('status', 'Pending')->first();
+        if ($pendingReq) {
+            $this->post("/management/requisitions/{$pendingReq->id}/approve")->assertRedirect();
+            $this->assertDatabaseHas('purchase_requisitions', ['id' => $pendingReq->id, 'status' => 'Approved']);
+        }
     }
 }

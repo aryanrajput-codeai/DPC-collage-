@@ -76,7 +76,7 @@ class SettingsController extends Controller
     {
         $data = $request->validate([
             'campus_id' => 'required|exists:campuses,id',
-            'code' => 'required|string|max:20|unique:colleges,code,' . $college->id,
+            'code' => 'required|string|max:20|unique:colleges,code,'.$college->id,
             'name' => 'required|string|max:255',
             'university_affiliation' => 'nullable|string|max:255',
             'aishe_code' => 'nullable|string|max:30',
@@ -100,7 +100,7 @@ class SettingsController extends Controller
     public function updateCampus(Request $request, Campus $campus): RedirectResponse
     {
         $data = $request->validate([
-            'code' => 'required|string|max:20|unique:campuses,code,' . $campus->id,
+            'code' => 'required|string|max:20|unique:campuses,code,'.$campus->id,
             'name' => 'required|string|max:255',
             'city' => 'required|string|max:100',
             'state' => 'required|string|max:100',
@@ -149,7 +149,7 @@ class SettingsController extends Controller
         $students = Student::with(['course', 'department'])->get();
         $headers = [
             'Content-Type' => 'text/csv',
-            'Content-Disposition' => 'attachment; filename="students_export_' . date('Ymd_His') . '.csv"',
+            'Content-Disposition' => 'attachment; filename="students_export_'.date('Ymd_His').'.csv"',
         ];
 
         return response()->stream(function () use ($students) {
@@ -193,7 +193,6 @@ class SettingsController extends Controller
 
         return response()->streamDownload(function () use ($payload) {
             echo json_encode($payload, JSON_PRETTY_PRINT);
-        }, 'college_erp_backup_' . date('Ymd_His') . '.json');
+        }, 'college_erp_backup_'.date('Ymd_His').'.json');
     }
 }
-

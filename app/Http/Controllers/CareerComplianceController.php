@@ -117,7 +117,7 @@ class CareerComplianceController extends Controller
         ]);
 
         $cert = Certificate::create([
-            'certificate_no' => 'CERT-' . strtoupper(substr($data['certificate_type'], 0, 3)) . '-' . date('Y') . '-' . rand(100, 999),
+            'certificate_no' => 'CERT-'.strtoupper(substr($data['certificate_type'], 0, 3)).'-'.date('Y').'-'.rand(100, 999),
             'student_id' => $data['student_id'],
             'certificate_type' => $data['certificate_type'],
             'issue_date' => now()->toDateString(),
@@ -161,7 +161,7 @@ class CareerComplianceController extends Controller
             'subject' => 'required|string|max:255',
             'description' => 'required|string',
         ]);
-        $data['ticket_no'] = 'GRV-' . date('Y') . '-' . rand(100, 999);
+        $data['ticket_no'] = 'GRV-'.date('Y').'-'.rand(100, 999);
         $data['is_confidential'] = $request->boolean('is_confidential');
         Grievance::create($data);
 
@@ -193,4 +193,3 @@ class CareerComplianceController extends Controller
         return back()->with('success', 'Disciplinary & counselling record logged.');
     }
 }
-

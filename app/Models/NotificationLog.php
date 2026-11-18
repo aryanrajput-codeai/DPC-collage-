@@ -2,6 +2,4 @@
 
 namespace App\Models;
 
-class NotificationLog extends BaseModel
-{
-}
+class NotificationLog extends BaseModel {}

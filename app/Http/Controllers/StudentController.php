@@ -85,10 +85,10 @@ class StudentController extends Controller
             'course_id' => $data['course_id'],
             'current_semester' => $data['current_semester'],
             'class_section_id' => $data['class_section_id'] ?? null,
-            'unique_student_id' => 'VV' . date('y') . 'ST' . str_pad((string) $seq, 3, '0', STR_PAD_LEFT),
-            'admission_number' => 'ADM-' . date('Y') . '-' . str_pad((string) $seq, 3, '0', STR_PAD_LEFT),
-            'registration_number' => 'REG-' . date('Y') . '-' . str_pad((string) $seq, 4, '0', STR_PAD_LEFT),
-            'roll_number' => 'R-' . str_pad((string) $seq, 3, '0', STR_PAD_LEFT),
+            'unique_student_id' => 'VV'.date('y').'ST'.str_pad((string) $seq, 3, '0', STR_PAD_LEFT),
+            'admission_number' => 'ADM-'.date('Y').'-'.str_pad((string) $seq, 3, '0', STR_PAD_LEFT),
+            'registration_number' => 'REG-'.date('Y').'-'.str_pad((string) $seq, 4, '0', STR_PAD_LEFT),
+            'roll_number' => 'R-'.str_pad((string) $seq, 3, '0', STR_PAD_LEFT),
             'full_name' => $data['full_name'],
             'email' => $data['email'],
             'phone' => $data['phone'],
@@ -175,4 +175,3 @@ class StudentController extends Controller
         return view('students.id_card', compact('student'));
     }
 }
-

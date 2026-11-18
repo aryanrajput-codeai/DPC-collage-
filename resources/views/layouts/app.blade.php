@@ -30,10 +30,37 @@
 
         @php($roleSlug = auth()->user()->role?->slug)
         <nav class="flex-1 overflow-y-auto px-3 py-4 space-y-5 text-sm">
+            @if($roleSlug === 'management')
+            <div>
+                <div class="px-3 text-[10px] font-bold uppercase tracking-wider text-[#fbbf24] mb-1.5 flex items-center justify-between">
+                    <span>Executive Board</span>
+                    <span class="text-[9px] bg-amber-400 text-slate-900 px-1 py-0.2 rounded font-black">GOV</span>
+                </div>
+                <a href="{{ route('management.dashboard') }}" class="flex items-center px-3 py-2 rounded-lg {{ request()->routeIs('management.dashboard') ? 'bg-gradient-to-r from-[#701a75] to-[#4a044e] text-[#fbbf24] font-semibold border-l-3 border-[#fbbf24] shadow-sm' : 'text-slate-300 hover:bg-[#2e0847] hover:text-[#fbbf24]' }} transition-all">Chairman Overview</a>
+            </div>
+
+            <div>
+                <div class="px-3 text-[10px] font-bold uppercase tracking-wider text-[#fbbf24]/80 mb-1.5">Solvency & Fiscal Audit</div>
+                <a href="{{ route('fees.index') }}" class="block px-3 py-1.5 rounded-lg {{ request()->routeIs('fees.*') ? 'bg-gradient-to-r from-[#701a75] to-[#4a044e] text-[#fbbf24] font-semibold border-l-3 border-[#fbbf24] shadow-sm' : 'text-slate-300 hover:bg-[#2e0847] hover:text-[#fbbf24]' }} transition-all">Student Fee Collections</a>
+                <a href="{{ route('finance.index') }}" class="block px-3 py-1.5 rounded-lg {{ request()->routeIs('finance.*') ? 'bg-gradient-to-r from-[#701a75] to-[#4a044e] text-[#fbbf24] font-semibold border-l-3 border-[#fbbf24] shadow-sm' : 'text-slate-300 hover:bg-[#2e0847] hover:text-[#fbbf24]' }} transition-all">Accounts & Vouchers</a>
+                <a href="{{ route('procurement.index') }}" class="block px-3 py-1.5 rounded-lg {{ request()->routeIs('procurement.*') ? 'bg-gradient-to-r from-[#701a75] to-[#4a044e] text-[#fbbf24] font-semibold border-l-3 border-[#fbbf24] shadow-sm' : 'text-slate-300 hover:bg-[#2e0847] hover:text-[#fbbf24]' }} transition-all">CapEx & Requisitions</a>
+                <a href="{{ route('payroll.index') }}" class="block px-3 py-1.5 rounded-lg {{ request()->routeIs('payroll.*') ? 'bg-gradient-to-r from-[#701a75] to-[#4a044e] text-[#fbbf24] font-semibold border-l-3 border-[#fbbf24] shadow-sm' : 'text-slate-300 hover:bg-[#2e0847] hover:text-[#fbbf24]' }} transition-all">Payroll & Remittances</a>
+            </div>
+
+            <div>
+                <div class="px-3 text-[10px] font-bold uppercase tracking-wider text-[#fbbf24]/80 mb-1.5">Academic & Accreditations</div>
+                <a href="{{ route('academics.index') }}" class="block px-3 py-1.5 rounded-lg {{ request()->routeIs('academics.*') ? 'bg-gradient-to-r from-[#701a75] to-[#4a044e] text-[#fbbf24] font-semibold border-l-3 border-[#fbbf24] shadow-sm' : 'text-slate-300 hover:bg-[#2e0847] hover:text-[#fbbf24]' }} transition-all">Courses & Seat Matrix</a>
+                <a href="{{ route('community.accreditation_research') }}" class="block px-3 py-1.5 rounded-lg {{ request()->routeIs('community.accreditation_research') ? 'bg-gradient-to-r from-[#701a75] to-[#4a044e] text-[#fbbf24] font-semibold border-l-3 border-[#fbbf24] shadow-sm' : 'text-slate-300 hover:bg-[#2e0847] hover:text-[#fbbf24]' }} transition-all">NAAC / NCTE & Grants</a>
+                <a href="{{ route('community.events_alumni') }}" class="block px-3 py-1.5 rounded-lg {{ request()->routeIs('community.events_alumni') ? 'bg-gradient-to-r from-[#701a75] to-[#4a044e] text-[#fbbf24] font-semibold border-l-3 border-[#fbbf24] shadow-sm' : 'text-slate-300 hover:bg-[#2e0847] hover:text-[#fbbf24]' }} transition-all">8,500+ Alumni Network</a>
+                <a href="{{ route('grievances.index') }}" class="block px-3 py-1.5 rounded-lg {{ request()->routeIs('grievances.*') ? 'bg-gradient-to-r from-[#701a75] to-[#4a044e] text-[#fbbf24] font-semibold border-l-3 border-[#fbbf24] shadow-sm' : 'text-slate-300 hover:bg-[#2e0847] hover:text-[#fbbf24]' }} transition-all">Grievance & Legal Audit</a>
+            </div>
+            @endif
+
             @if($roleSlug === 'super_admin')
             <div>
                 <div class="px-3 text-[10px] font-bold uppercase tracking-wider text-[#fbbf24]/80 mb-1.5">Overview</div>
-                <a href="{{ route('dashboard') }}" class="flex items-center px-3 py-2 rounded-lg {{ request()->routeIs('dashboard') ? 'bg-gradient-to-r from-[#701a75] to-[#4a044e] text-[#fbbf24] font-semibold border-l-3 border-[#fbbf24] shadow-sm' : 'text-slate-300 hover:bg-[#2e0847] hover:text-[#fbbf24]' }} transition-all">Dashboard & Analytics</a>
+                <a href="{{ route('dashboard') }}" class="flex items-center px-3 py-2 rounded-lg {{ request()->routeIs('dashboard') ? 'bg-gradient-to-r from-[#701a75] to-[#4a044e] text-[#fbbf24] font-semibold border-l-3 border-[#fbbf24] shadow-sm' : 'text-slate-300 hover:bg-[#2e0847] hover:text-[#fbbf24]' }} transition-all">Principal Dashboard</a>
+                <a href="{{ route('management.dashboard') }}" class="flex items-center px-3 py-2 rounded-lg {{ request()->routeIs('management.dashboard') ? 'bg-gradient-to-r from-[#701a75] to-[#4a044e] text-[#fbbf24] font-semibold border-l-3 border-[#fbbf24] shadow-sm' : 'text-slate-300 hover:bg-[#2e0847] hover:text-[#fbbf24]' }} transition-all">Chairman Hub</a>
             </div>
 
             <div>

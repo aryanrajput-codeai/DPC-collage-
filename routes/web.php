@@ -12,6 +12,7 @@ use App\Http\Controllers\FacilityLmsController;
 use App\Http\Controllers\FeeFinanceController;
 use App\Http\Controllers\HrPayrollController;
 use App\Http\Controllers\LibraryController;
+use App\Http\Controllers\ManagementController;
 use App\Http\Controllers\PortalController;
 use App\Http\Controllers\SettingsController;
 use App\Http\Controllers\StudentController;
@@ -27,6 +28,13 @@ Route::middleware('auth')->group(function () {
     Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
 
     // Role Portals
+    Route::get('/management/dashboard', [ManagementController::class, 'dashboard'])
+        ->middleware('role:super_admin,management')
+        ->name('management.dashboard');
+    Route::post('/management/requisitions/{requisition}/approve', [ManagementController::class, 'approveRequisition'])
+        ->middleware('role:super_admin,management')
+        ->name('management.capex.approve');
+
     Route::get('/portal/student', [PortalController::class, 'studentPortal'])
         ->middleware('role:super_admin,student')
         ->name('portal.student');
@@ -87,8 +95,8 @@ Route::middleware('auth')->group(function () {
         Route::post('/library/issues/{issue}/renew', [LibraryController::class, 'renewBook'])->name('library.renew');
     });
 
-    // Finance & Fee Accountant modules (Admin, Accountant)
-    Route::middleware('role:super_admin,accountant')->group(function () {
+    // Finance & Fee Accountant modules (Admin, Accountant, Management)
+    Route::middleware('role:super_admin,accountant,management')->group(function () {
         Route::get('/fees', [FeeFinanceController::class, 'fees'])->name('fees.index');
         Route::post('/fees/structures', [FeeFinanceController::class, 'storeFeeStructure'])->name('fees.structures.store');
         Route::post('/fees/accounts/{account}/collect', [FeeFinanceController::class, 'collectFee'])->name('fees.collect');
@@ -103,6 +111,14 @@ Route::middleware('auth')->group(function () {
         Route::get('/payroll', [HrPayrollController::class, 'payroll'])->name('payroll.index');
         Route::post('/payroll/process', [HrPayrollController::class, 'processPayroll'])->name('payroll.process');
         Route::get('/payroll/{payroll}/payslip', [HrPayrollController::class, 'payslip'])->name('payroll.payslip');
+    });
+
+    // Governance & Compliance modules accessible to Management & Admin
+    Route::middleware('role:super_admin,management')->group(function () {
+        Route::get('/academics', [AcademicController::class, 'index'])->name('academics.index');
+        Route::get('/events-alumni', [CampusCommunityController::class, 'eventsAlumni'])->name('community.events_alumni');
+        Route::get('/accreditation-research', [CampusCommunityController::class, 'accreditationResearch'])->name('community.accreditation_research');
+        Route::get('/grievances', [CareerComplianceController::class, 'grievances'])->name('grievances.index');
     });
 
     // Admin ERP Modules (Super Admin)
@@ -129,7 +145,6 @@ Route::middleware('auth')->group(function () {
         Route::post('/students/{student}/status', [StudentController::class, 'updateStatus'])->name('students.status');
         Route::post('/students/{student}/documents', [StudentController::class, 'uploadDocument'])->name('students.documents');
 
-        Route::get('/academics', [AcademicController::class, 'index'])->name('academics.index');
         Route::post('/academics/departments', [AcademicController::class, 'storeDepartment'])->name('academics.departments.store');
         Route::post('/academics/courses', [AcademicController::class, 'storeCourse'])->name('academics.courses.store');
         Route::post('/academics/subjects', [AcademicController::class, 'storeSubject'])->name('academics.subjects.store');
@@ -158,16 +173,13 @@ Route::middleware('auth')->group(function () {
         Route::get('/certificates', [CareerComplianceController::class, 'certificates'])->name('certificates.index');
         Route::post('/certificates', [CareerComplianceController::class, 'issueCertificate'])->name('certificates.store');
 
-        Route::get('/grievances', [CareerComplianceController::class, 'grievances'])->name('grievances.index');
         Route::post('/grievances', [CareerComplianceController::class, 'storeGrievance'])->name('grievances.store');
         Route::post('/grievances/{grievance}/resolve', [CareerComplianceController::class, 'resolveGrievance'])->name('grievances.resolve');
         Route::post('/disciplinary', [CareerComplianceController::class, 'storeDisciplinary'])->name('disciplinary.store');
 
-        Route::get('/events-alumni', [CampusCommunityController::class, 'eventsAlumni'])->name('community.events_alumni');
         Route::post('/events', [CampusCommunityController::class, 'storeEvent'])->name('events.store');
         Route::post('/alumni', [CampusCommunityController::class, 'storeAlumnus'])->name('alumni.store');
 
-        Route::get('/accreditation-research', [CampusCommunityController::class, 'accreditationResearch'])->name('community.accreditation_research');
         Route::post('/accreditation', [CampusCommunityController::class, 'storeAccreditation'])->name('accreditation.store');
         Route::post('/research', [CampusCommunityController::class, 'storeResearch'])->name('research.store');
 

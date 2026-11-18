@@ -152,4 +152,3 @@ class CampusCommunityController extends Controller
         return back()->with('success', 'Announcement published & notifications dispatched.');
     }
 }
-

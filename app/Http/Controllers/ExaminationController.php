@@ -117,7 +117,7 @@ class ExaminationController extends Controller
         $exam->load('schedules.subject', 'course');
         $registration = ExamRegistration::firstOrCreate(
             ['exam_id' => $exam->id, 'student_id' => $student->id],
-            ['seat_no' => 'SEAT-' . rand(100, 999), 'admit_card_number' => 'ADM-' . $exam->id . '-' . $student->id]
+            ['seat_no' => 'SEAT-'.rand(100, 999), 'admit_card_number' => 'ADM-'.$exam->id.'-'.$student->id]
         );
 
         return view('exams.admit_card', compact('exam', 'student', 'registration'));
@@ -134,4 +134,3 @@ class ExaminationController extends Controller
         return view('exams.marksheet', compact('student', 'marks', 'sgpa', 'totalCredits'));
     }
 }
-

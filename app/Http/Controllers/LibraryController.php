@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\LibraryBook;
 use App\Models\LibraryIssue;
 use App\Models\User;
+use Carbon\Carbon;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\View\View;
@@ -39,7 +40,7 @@ class LibraryController extends Controller
             'total_copies' => 'required|integer|min:1|max:500',
         ]);
         $data['available_copies'] = $data['total_copies'];
-        $data['barcode'] = 'LIB' . rand(10000, 99999);
+        $data['barcode'] = 'LIB'.rand(10000, 99999);
         LibraryBook::create($data);
 
         return back()->with('success', 'Book added to library catalogue.');
@@ -82,7 +83,7 @@ class LibraryController extends Controller
         }
 
         $today = now();
-        $due = \Carbon\Carbon::parse($issue->due_date);
+        $due = Carbon::parse($issue->due_date);
         $overdueDays = $today->gt($due) ? $due->diffInDays($today) : 0;
         $fine = $overdueDays * 5; // ₹5 per day overdue fine
 
@@ -100,10 +101,9 @@ class LibraryController extends Controller
 
     public function renewBook(LibraryIssue $issue): RedirectResponse
     {
-        $newDue = \Carbon\Carbon::parse($issue->due_date)->addDays(14)->toDateString();
+        $newDue = Carbon::parse($issue->due_date)->addDays(14)->toDateString();
         $issue->update(['due_date' => $newDue, 'status' => 'Issued']);
 
         return back()->with('success', "Book renewed until {$newDue}.");
     }
 }
-

@@ -2,6 +2,4 @@
 
 namespace App\Models;
 
-class SystemSetting extends BaseModel
-{
-}
+class SystemSetting extends BaseModel {}
